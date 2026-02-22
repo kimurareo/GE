@@ -127,6 +127,7 @@ Transform cameraTransform
 	{ 0.0f, 0.0f, -5.0f} // translate
 };
 
+
 // 頂点データ
 struct VertexData
 {
