@@ -5,6 +5,7 @@
 #include <wrl.h>
 
 
+
 D3DResourceLeakChecker::~D3DResourceLeakChecker()
 {
 	//リソースリークチェック
