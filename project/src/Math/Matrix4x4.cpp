@@ -1,6 +1,5 @@
-#include "Matrix4x4.h"
 #define _USE_MATH_DEFINES 
-
+#include "Matrix4x4.h"
 #include <math.h>
 #include <cassert>
 #include <cmath>
@@ -8,8 +7,7 @@
 using namespace MatrixMath;
 
 // 行列の加法
-Matrix4x4 MatrixMath::Add(const Matrix4x4& m1, const Matrix4x4& m2)
-{
+Matrix4x4 MatrixMath::Add(const Matrix4x4& m1, const Matrix4x4& m2) {
     Matrix4x4 result = {};
 
     for (int row = 0; row < 4; row++)
@@ -23,8 +21,7 @@ Matrix4x4 MatrixMath::Add(const Matrix4x4& m1, const Matrix4x4& m2)
     return result;
 }
 // 行列の減法
-Matrix4x4 MatrixMath::Subtract(const Matrix4x4& m1, const Matrix4x4& m2)
-{
+Matrix4x4 MatrixMath::Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
     Matrix4x4 result = {};
 
     for (int row = 0; row < 4; row++)
@@ -37,8 +34,7 @@ Matrix4x4 MatrixMath::Subtract(const Matrix4x4& m1, const Matrix4x4& m2)
     return result;
 }
 // 4x4行列の積
-Matrix4x4 MatrixMath::Multipty(const Matrix4x4& m1, const Matrix4x4& m2)
-{
+Matrix4x4 MatrixMath::Multipty(const Matrix4x4& m1, const Matrix4x4& m2) {
     Matrix4x4 result;
 
     for (int row = 0; row < 4; ++row)

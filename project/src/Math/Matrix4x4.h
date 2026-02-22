@@ -4,6 +4,15 @@ struct Matrix4x4
 
 	float m[4][4];
 };
+/*
+struct Vector2
+{
+	float x;
+	float y;
+};*/
+
+
+
 struct Vector3
 {
 	float x, y, z;
