@@ -44,15 +44,9 @@
 #include"SpriteCommon.h"
 
 
-
-
-
 #include "Matrix4x4.h"
 #include "Vector2.h"
 #include "Vector4.h"
-
-
-
 
 
 #define _USE_MATH_DEFINES
