@@ -1,20 +1,15 @@
 #include <Windows.h>
 #include <cstdint>
 #include <string>
-#include <format>
-#include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <chrono> 
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <cassert>
-#include <numbers>
 #include <dxgidebug.h>
 #include <dxcapi.h>
 
 #include <dbghelp.h>
-#include <strsafe.h>
 #include <wrl.h>
 #include <xaudio2.h>
 #define DIRECTINPUT_VERSION   0x0800 //DirectInput
@@ -57,7 +52,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 #pragma comment(lib,"Dbghelp.lib")
 #pragma comment(lib,"dxguid.lib")
 #pragma comment(lib,"dxcompiler.lib")
-#pragma comment(lib,"xaudio2.lib")
 #pragma comment(lib,"dinput8.lib")
 #pragma comment(lib,"dxguid.lib") 
 
@@ -574,10 +568,6 @@ void SoundPlayWave(Microsoft::WRL::ComPtr<IXAudio2> xAudio2, const SoundData& so
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
 
-
-
-
-
 	// ポインタ
 	Input* input = nullptr; // input
 	WinApp* winApp = nullptr; // windowAPI
@@ -664,9 +654,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
 	// テクスチャマネージャの初期化
 	TextureManager::GetInstance()->Initialize(dxCommon);
-
-
-
+	
+	// テクスチャの読み込み
+	std::string textureFilePath = "Resources/uvChecker.png";
+	uint32_t textureIndex = 0;
+	TextureManager::GetInstance()->LoadTexture(textureFilePath);
 
 	//* モデル *//
 
@@ -790,10 +782,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 #pragma region 最初のシーン
 
 	// ポインタ
-	Sprite* sprite = nullptr;
-	sprite = new Sprite();
-	sprite->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
+	//Sprite* sprite = nullptr;
+	//sprite = new Sprite();
+	//sprite->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
 
+	Sprite* sprite[3];
+
+	for (int i = 0; i < 3; i++)
+	{
+		sprite[i] = new Sprite();
+		sprite[i]->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
+		sprite[i]->SetPosition({ float(100 + i * 200),100 });
+	}
 
 	dxCommon->GetCommandList()->Close();
 	ID3D12CommandList* commandLists[] = { dxCommon->GetCommandList() };
@@ -928,8 +928,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// *スプライト* //
 
 		// sprite更新
-		sprite->Update();
-
+		for (int i = 0; i < 3; i++)
+		{
+			sprite[i]->Update();
+		}
 
 		// これから書き込むバックバッファのインデックスを取得
 
@@ -994,8 +996,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		dxCommon->GetCommandList()->DrawIndexedInstanced(UINT(modelData.vertices.size()), 1, 0, 0,0);
 
 		// スプライト描画
-		sprite->Draw();
-
+		for (int i = 0; i < 3; i++)
+		{
+			sprite[i]->Draw();
+		}
 		// 実際のcommandListのImGuiの描画コマンドを詰む
 		ImGui::Render();
 		if (ImDrawData* draw_data = ImGui::GetDrawData())
@@ -1029,7 +1033,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// DirectX解放
 	delete dxCommon;
 	// スプライト解放
-	delete sprite;
+	for (int i = 0; i < 3; i++)
+	{
+		delete sprite[i];
+	}
 	delete spriteCommon;
 
 	CoUninitialize();
