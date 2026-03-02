@@ -985,11 +985,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		// 平行光源
 		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
 
+		D3D12_GPU_DESCRIPTOR_HANDLE textureHandle = dxCommon->GetSRVGPUDescriptorHandle(1);
+		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureHandle);
 
 		// インデックスバッファビューを設定
 		dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewVertex);
 		// インデックスを使って描画（球）
-		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), 1, 0, 0);
+		dxCommon->GetCommandList()->DrawIndexedInstanced(UINT(modelData.vertices.size()), 1, 0, 0,0);
 
 		// スプライト描画
 		sprite->Draw();
