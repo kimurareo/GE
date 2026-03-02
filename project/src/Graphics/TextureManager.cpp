@@ -87,7 +87,7 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 	// 生成
-	//dxCommon->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+	dxCommon->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
 
 	// 転送用に生成した中間リソースをテクスチャデータ構造体に格納
 	textureData.intermediateResource = dxCommon->UploadTextureData(textureData.resource, mipImages);
