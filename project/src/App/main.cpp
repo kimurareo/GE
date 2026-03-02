@@ -3,9 +3,9 @@
 #include <string>
 #include <format>
 #include <filesystem>
-#include <fstream>// ファイルを書いたり読み込んだりするライブラリ
+#include <fstream>
 #include <sstream>
-#include <chrono> // 時間を扱うライブラリ 
+#include <chrono> 
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <cassert>
@@ -13,7 +13,6 @@
 #include <dxgidebug.h>
 #include <dxcapi.h>
 
-// Debug用
 #include <dbghelp.h>
 #include <strsafe.h>
 #include <wrl.h>
@@ -25,15 +24,6 @@
 
 #include <combaseapi.h> // CoInitializeEx
 
-
-//旧
-//#include "Input.h"
-//#include "WinApp.h"
-//#include "DirectXCommon.h"
-//#include "StringUtility.h"
-
-
-//新
 #include"Input.h"
 #include"WinApp.h"
 #include"DirectXCommon.h"
@@ -714,11 +704,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	// 頂点バッファビューを作成する
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView = {};
 	vertexBufferView.BufferLocation = vertexResource->GetGPUVirtualAddress();
-	// 使用するリソースのサイズ
 	vertexBufferView.SizeInBytes = UINT(sizeof(VertexData) * modelData.vertices.size());
-	// 1頂点あたりのサイズ
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
-
 	// 頂点リソースにデータを書き込む
 	VertexData* vertexData = nullptr;
 	// 書き込むためのアドレスを取得
@@ -808,10 +795,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	sprite->Initialize(spriteCommon, winApp, dxCommon, "Resources/uvChecker.png");
 
 
+	dxCommon->GetCommandList()->Close();
+	ID3D12CommandList* commandLists[] = { dxCommon->GetCommandList() };
+	dxCommon->GetCommandQueue()->ExecuteCommandLists(1, commandLists);
+
+	dxCommon->IncrementFenceValue();
+	dxCommon->GetCommandQueue()->Signal(dxCommon->GetFence(), dxCommon->GetFenceValue());
+
+	if (dxCommon->GetFence()->GetCompletedValue() < dxCommon->GetFenceValue()) {
+		dxCommon->GetFence()->SetEventOnCompletion(dxCommon->GetFenceValue(), dxCommon->GetFenceEvent());
+		WaitForSingleObject(dxCommon->GetFenceEvent(), INFINITE);
+	}
+
+	// 次の描画のためにリセット
+	dxCommon->GetCommandAllocator()->Reset();
+	dxCommon->GetCommandList()->Reset(dxCommon->GetCommandAllocator(), nullptr);
+
 #pragma endregion
-
-
-
 
 	// TextureをtextureResource 読んで転送
 	//DirectX::ScratchImage mipImages = dxCommon->LoadTexture("Resource/uvChecker.png");
@@ -984,6 +984,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		//dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, useMonsterBall ? textureSrvHandleGPU2 : textureSrvHandleGPU);
 		// 平行光源
 		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(3, directionalLightResource->GetGPUVirtualAddress());
+
 
 		// インデックスバッファビューを設定
 		dxCommon->GetCommandList()->IASetIndexBuffer(&indexBufferViewVertex);

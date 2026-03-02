@@ -79,7 +79,14 @@ public:
 	// テクスチャファイルの読み込み
 	static DirectX::ScratchImage LoadTexture(const std::string& filePath);
 
-
+	// 外部から各オブジェクトを取得するための関数
+	ID3D12GraphicsCommandList* GetCommandList() { return commandList.Get(); }
+	ID3D12CommandQueue* GetCommandQueue() { return commandQueue.Get(); }
+	ID3D12Fence* GetFence() { return fence.Get(); }
+	HANDLE GetFenceEvent() { return fenceEvent; }
+	ID3D12CommandAllocator* GetCommandAllocator() { return commandAllocator.Get(); }
+	uint64_t GetFenceValue() { return fenceValue; }
+	void IncrementFenceValue() { fenceValue++; }
 
 private:
 	// DirectX12デバイス

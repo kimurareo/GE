@@ -303,7 +303,7 @@ void DirectXCommon::InitializeRTV()
 	assert(SUCCEEDED(hr));
 
 	// RTVの設定
-	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 出力結果をSRGBに変換して書き込む
+	rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM; // 出力結果をSRGBに変換して書き込む
 	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D; // 2dテクスチャとして書き込む
 	// ディスクリプタの先頭を取得する
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvStartHandle = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
@@ -385,21 +385,19 @@ void DirectXCommon::InitializeImGui()
 // 描画前処理
 void DirectXCommon::PreDraw()
 {
+	
+
 	// バックバッファの番号取得
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-	// TransitionBarrierの設定
-	// 今回のバリアはTransition
+	D3D12_RESOURCE_BARRIER barrier{};
 	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-	// Noneにしておく
 	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
-	// バリアを張る対象のリソース。現在のバッファに対して行う
 	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
-	// 遷移前（現在）のResourceState
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-	// 遷移後のResourceStare
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-	// TransitionBarrierを張る
+
 	commandList->ResourceBarrier(1, &barrier);
 
 	// 描画先のRTVとDSVを設定する
@@ -423,16 +421,20 @@ void DirectXCommon::PreDraw()
 // 描画後処理
 void DirectXCommon::PostDraw()
 {
+	
+
 	// バックバッファの番号取得
 	UINT backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 
-	// 画面に書く処理は全て終わり、画面に映すので、状態を遷移
-	// 今回はRenderTragetからPresentにする
+	D3D12_RESOURCE_BARRIER barrier{};
+	barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+	barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	barrier.Transition.pResource = swapChainResources[backBufferIndex].Get();
+	barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 	barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET;
 	barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_PRESENT;
-	// TranstionBarrierを張る
-	commandList->ResourceBarrier(1, &barrier);
 
+	commandList->ResourceBarrier(1, &barrier);
 	// FPS固定
 	UpdateFixFPS();
 
@@ -443,7 +445,7 @@ void DirectXCommon::PostDraw()
 	// GPUにコマンドリストの実行を行わせる
 	ID3D12CommandList* commandLists[] = { commandList.Get() };
 	commandQueue->ExecuteCommandLists(_countof(commandLists), commandLists);
-
+	
 	// GPUとOSに画面の交換を行うよう通知する
 	swapChain->Present(1, 0);
 

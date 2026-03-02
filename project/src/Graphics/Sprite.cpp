@@ -8,9 +8,6 @@
 
 
 
-
-
-
 void Sprite::Initialize(SpriteCommon* spriteCommon, WinApp* winApp, DirectXCommon* dxCommon, std::string textureFilePath)
 {
 	// 引数で受け取ってメンバ変数に記録する
